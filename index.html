@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        table, .txt {
+            margin: 20px auto;
+            text-align: center;
+        }
+        td {
+            border: 1px solid black;
+            width: 120px;
+            height: 120px;
+        }
+        .red {
+            background: red;
+        }
+        .blue {
+            background: blue;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <div class="txt">
+        <input type="button" id="startBtn" value="開始遊戲"><br>
+        目前分數：<span id="scoreNum"></span><br>
+        最高分數：<span id="highestName"></span>的分數是<span id="highestScore">0</span><br>
+    </div>
+    
+    <script>
+        let score=0;
+        let scoreNum=document.getElementById('scoreNum');
+        let startBtn=document.getElementById('startBtn');
+        let tds=document.getElementsByTagName('td');
+        let gameTimer=0;
+
+        let highest={name:'' ,score:0};
+        let highestName=document.getElementById('highestName');
+        let highestScore=document.getElementById('highestScore');
+
+        let highestStorage=window.localStorage.getItem('highestScore');
+        if(highestStorage!=null){
+            highest=JSON.parse(highestStorage);
+            highestName.innerText=highest.name;
+            highestScore.innerText=highest.score;
+        }
+
+        startBtn.onclick=()=>{
+            startBtn.setAttribute('disabled',true);
+            score=0;
+            scoreNum.innerText=score;
+            gameTimer=setInterval(game,1000);
+            game();
+
+            setTimeout(()=>{
+                clearInterval(gameTimer);
+                for(let td of tds){
+                    td.classList.remove('red');
+                    td.classList.remove('blue');
+                }
+                alert(`時間到，你得到${score}分！`);
+                startBtn.removeAttribute('disabled');
+
+                if(score>highest.score){
+                    let playerName=prompt('恭喜你得到最高分，請輸入名字');
+                    highest.name=playerName;
+                    highestName.innerText=playerName;
+                    highest.score=score;
+                    highestScore.innerText=score;
+                    window.localStorage.setItem('highestScore',JSON.stringify(highest));
+                }
+            },5000)
+        }
+
+        let game=()=>{
+            for(let td of tds) {
+                td.classList.remove('red');
+                td.classList.remove('blue');
+            }
+            let randArr=[];
+            for(let i=0;i<3;i++) {
+                let rand=Math.round(Math.random()*8);
+                if (randArr.includes(rand)) {
+                    i--;
+                } else {
+                    randArr.push(rand);
+                    tds[rand].classList.add('red');
+                    console.log(randArr);
+                }
+            }
+        }
+
+        for(let td of tds) {
+            td.onclick=()=>{
+                if(td.classList.contains('red')) {
+                    td.classList.remove('red');
+                    td.classList.add('blue');
+                    score++;
+                    scoreNum.innerText=score;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
